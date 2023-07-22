@@ -25,6 +25,12 @@ def add_values():
             new_dig_s_qout_day = st.number_input("Fill in **DIGESTED_SLUDGE_QOUT_DAY**")
             new_dig_s_dwtr_ds_after_per_week = st.number_input("Fill in **DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK**")
         submitted = st.form_submit_button()
+
+        ###
+        ### Here we will be using the model to forecast the value of BIOGAS_PRODUCTION_Q_DAY
+        ### This should be inside a function called forecast() or something similar
+        ###
+
         if submitted:
             new_entry = {'Date':new_date, 'PS_Q_DAY':new_ps_q_day, 'TPS_Q1_DAY':new_tps_q1_day, 'TWAS_DAF_QIN_DAY':new_twas_daf_qin_day, \
                         'DIGESTED_SLUDGE_QOUT_DAY':new_dig_s_qout_day, 'BIOGAS_PRODUCTION_Q_DAY':0, \
@@ -38,12 +44,12 @@ def add_metrics():
     kpi1, kpi2 = st.columns(2)
 
     kpi1.metric(
-        label="BIOGAS_PRODUCTION_Q_DAY",
+        label="**BIOGAS_PRODUCTION_Q_DAY**",
         value=kpi_metric["BIOGAS_PRODUCTION_Q_DAY"],
     )
 
     kpi2.metric(
-        label="DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK",
+        label="**DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK**",
         value=kpi_metric["DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"]
     )
 
@@ -70,7 +76,8 @@ if __name__ == "__main__":
     )
     df = get_data()
     # Title
-    st.title("Biogas production")
+    # st.title("Biogas production")
+    st.markdown("<h1 style='text-align: center; color: black;'>Biogas production</h1>", unsafe_allow_html=True)
 
     placeholder = st.empty()
 
@@ -79,14 +86,14 @@ if __name__ == "__main__":
         if 'data' not in st.session_state:
             st.session_state.data = df
 
+        add_values()
+
         # Top-level filter
-        date_filter = st.selectbox("Select Date", pd.unique(st.session_state.data["Date"]))
+        date_filter = st.selectbox("**Select Date**", pd.unique(st.session_state.data["Date"]))
         
         add_metrics()
 
         add_figures()
-
-        add_values()
 
         st.markdown("### Detailed Data View")
         #st.session_state.data = st.session_state.data.astype(str) # TODO: Weird error about Date ?? Not sure how to resolve
