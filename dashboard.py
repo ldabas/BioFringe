@@ -8,6 +8,11 @@ import streamlit as st
 def get_data() -> pd.DataFrame:
     return pd.read_csv('./viable_dataset.csv')
 
+def append_data(df, new_data):
+    new_row = pd.DataFrame(new_data, index=[0])
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv('./viable_dataset.csv', index=False)
+
 if __name__ == "__main__":
     st.set_page_config(
         page_title="BioFringe",
@@ -25,7 +30,6 @@ if __name__ == "__main__":
     placeholder = st.empty()
 
     with placeholder.container():
-
         kpi1, kpi2 = st.columns(2)
 
         kpi1.metric(
@@ -55,4 +59,16 @@ if __name__ == "__main__":
         st.markdown("### Detailed Data View")
         st.dataframe(df)
 
-            
+    # User input for all columns
+    new_data = {}
+    new_data["Date"] = st.text_input("Enter Date")
+    new_data["PS_Q_DAY"] = st.number_input("Enter PS_Q_DAY value")
+    new_data["TPS_Q1_DAY"] = st.number_input("Enter TPS_Q1_DAY value")
+    new_data["TWAS_DAF_QIN_DAY"] = st.number_input("Enter TWAS_DAF_QIN_DAY value")
+    new_data["DIGESTED_SLUDGE_QOUT_DAY"] = st.number_input("Enter DIGESTED_SLUDGE_QOUT_DAY value")
+    new_data["BIOGAS_PRODUCTION_Q_DAY"] = st.number_input("Enter BIOGAS_PRODUCTION_Q_DAY value")
+    new_data["DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"] = st.number_input("Enter DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK value")
+
+    if st.button("Add to CSV"):
+        append_data(df, new_data)
+        st.success("Data added successfully!")
