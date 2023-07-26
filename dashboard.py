@@ -103,17 +103,3 @@ if __name__ == "__main__":
         st.markdown("### Detailed Data View")
         #st.session_state.data = st.session_state.data.astype(str) # TODO: Weird error about Date ?? Not sure how to resolve
         st.dataframe(st.session_state.data)
-
-    # User input for all columns
-    new_data = {}
-    new_data["Date"] = st.text_input("Enter Date")
-    new_data["PS_Q_DAY"] = st.number_input("Enter PS_Q_DAY value")
-    new_data["TPS_Q1_DAY"] = st.number_input("Enter TPS_Q1_DAY value")
-    new_data["TWAS_DAF_QIN_DAY"] = st.number_input("Enter TWAS_DAF_QIN_DAY value")
-    new_data["DIGESTED_SLUDGE_QOUT_DAY"] = st.number_input("Enter DIGESTED_SLUDGE_QOUT_DAY value")
-    new_data["BIOGAS_PRODUCTION_Q_DAY"] = st.number_input("Enter BIOGAS_PRODUCTION_Q_DAY value")
-    new_data["DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"] = st.number_input("Enter DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK value")
-
-    if st.button("Add to CSV"):
-        append_data(df, new_data)
-        st.success("Data added successfully!")
