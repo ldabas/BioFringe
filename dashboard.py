@@ -3,15 +3,40 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from sklearn.preprocessing import MinMaxScaler
+from keras.models import load_model
 
 @st.cache_data
 def get_data() -> pd.DataFrame:
     return pd.read_csv('./data/viable_dataset.csv')
 
 def append_data(new_data):
-    new_entry = pd.Series(new_data)
     st.session_state.data = pd.concat([st.session_state.data, new_entry.to_frame().T]).reset_index(drop=True)
     st.session_state.data.to_csv('./data/viable_dataset.csv', index=False)
+
+def forecast_next_day(model, new_row, scaler, look_back):
+    # Scale the new row of data
+    new_row_scaled = scaler.transform(new_row.values.reshape(1, -1))
+
+    # Reshape the data to match the input shape for the LSTM model
+    new_row_reshaped = np.reshape(new_row_scaled, (1, look_back, new_row_scaled.shape[1]))
+
+    # Perform the forecast
+    forecast = model.predict(new_row_reshaped)
+
+    # Invert the scaling
+    forecast_inverted = scaler.inverse_transform(forecast)
+
+    return forecast_inverted
+
+def forecast(model, new_row):
+    # For now, this will forecast for next day,
+    # The functionality could be expanded to forecast for the
+    # next 7 days
+
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    look_back = 30
+    return forecast_next_day(model, new_row, scaler, look_back)
 
 def add_values():
     with st.form("add_new_data"):
@@ -40,6 +65,13 @@ def add_values():
             new_entry = {'Date':new_date, 'PS_Q_DAY':new_ps_q_day, 'TPS_Q1_DAY':new_tps_q1_day, 'TWAS_DAF_QIN_DAY':new_twas_daf_qin_day, \
                         'DIGESTED_SLUDGE_QOUT_DAY':new_dig_s_qout_day, 'BIOGAS_PRODUCTION_Q_DAY':0, \
                             'DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK':new_dig_s_dwtr_ds_after_per_week}
+            new_entry = pd.Series(new_entry)
+
+            # Load the model
+            model = load_model('lstm_model_multi-io-tomorrow.h5')
+
+            temp = forecast(model, new_entry)
+            print(temp)
             append_data(new_entry)
             st.success("Data added successfully!")
 
