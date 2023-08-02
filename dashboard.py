@@ -22,6 +22,9 @@ def forecast_next_day(model, past_data, new_row, scaler, look_back):
     # Ensure new_row is 1D and has the correct shape
     assert len(new_row.shape) == 1 and new_row.shape[0] == past_data.shape[1]
 
+    # Ensure that the biogas production variable is set to zero
+    assert new_row[4] == 0
+
     # Concatenate past_data and new_row along the time dimension
     data = np.concatenate([past_data, new_row[np.newaxis, :]], axis=0)
 
