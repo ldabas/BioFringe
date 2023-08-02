@@ -10,34 +10,44 @@ from keras.models import load_model
 def get_data() -> pd.DataFrame:
     return pd.read_csv('./data/viable_dataset.csv', index_col='Date')
 
-def append_data(new_data):
-    st.session_state.data = pd.concat([st.session_state.data, new_data]).reset_index(drop=True)
-    st.session_state.data.to_csv('./data/viable_dataset.csv', index=False)
+def append_data(new_data, new_date):
+    st.session_state.data.loc[new_date] = new_data
+    st.session_state.data.to_csv('./data/viable_dataset.csv', index=True)
 
-def forecast_next_day(model, new_row, scaler, look_back):
-    # Scale the new row of data
-    new_row = scaler.fit_transform(new_row)
-    new_row_scaled = scaler.transform(new_row.values.reshape(1, -1))
+def forecast_next_day(model, past_data, new_row, scaler, look_back):
 
-    # Reshape the data to match the input shape for the LSTM model
-    new_row_reshaped = np.reshape(new_row_scaled, (1, look_back, new_row_scaled.shape[1]))
+    # Ensure past_data is 2D and has the correct shape
+    assert len(past_data.shape) == 2 and past_data.shape[0] == look_back - 1
+
+    # Ensure new_row is 1D and has the correct shape
+    assert len(new_row.shape) == 1 and new_row.shape[0] == past_data.shape[1]
+
+    # Concatenate past_data and new_row along the time dimension
+    data = np.concatenate([past_data, new_row[np.newaxis, :]], axis=0)
+
+    # Scale the data
+    data = scaler.fit_transform(data)
+    data_scaled = scaler.transform(data)
+
+    # Add an extra dimension to match the input shape for the LSTM model
+    data_reshaped = np.expand_dims(data_scaled, axis=0)
 
     # Perform the forecast
-    forecast = model.predict(new_row_reshaped)
+    forecast = model.predict(data_reshaped)
 
     # Invert the scaling
-    forecast_inverted = scaler.inverse_transform(forecast)
+    forecast_inverted = scaler.inverse_transform(forecast[0])
 
     return forecast_inverted
 
-def forecast(model, new_row):
+def forecast(model, new_row, past_data):
     # For now, this will forecast for next day,
     # The functionality could be expanded to forecast for the
-    # next 7 days
+    # next 7 days once we add a new model in
 
     scaler = MinMaxScaler(feature_range=(0, 1))
     look_back = 30
-    return forecast_next_day(model, new_row, scaler, look_back)
+    return forecast_next_day(model, past_data, new_row, scaler, look_back)
 
 def add_values():
     with st.form("add_new_data"):
@@ -57,23 +67,17 @@ def add_values():
             new_dig_s_dwtr_ds_after_per_week = st.number_input("Enter **DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK**")
         submitted = st.form_submit_button()
 
-        ###
-        ### Here we will be using the model to forecast the value of BIOGAS_PRODUCTION_Q_DAY
-        ### This should be inside a function called forecast() or something similar
-        ###
-
         if submitted:
-            new_entry = {'PS_Q_DAY':new_ps_q_day, 'TPS_Q1_DAY':new_tps_q1_day, 'TWAS_DAF_QIN_DAY':new_twas_daf_qin_day, \
-                        'DIGESTED_SLUDGE_QOUT_DAY':new_dig_s_qout_day, 'BIOGAS_PRODUCTION_Q_DAY':0, \
-                            'DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK':new_dig_s_dwtr_ds_after_per_week}
-            new_entry = pd.DataFrame(new_entry, index=[new_date])
-            append_data(new_entry)
+            new_row = np.array([new_ps_q_day, new_tps_q1_day, new_twas_daf_qin_day, new_dig_s_qout_day, 0, new_dig_s_dwtr_ds_after_per_week])
 
             # Load the model
             model = load_model('./models/lstm_model_multi-io-tomorrow.h5')
+            look_back = 30
+            past_data = df.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
 
-            temp = forecast(model, new_entry)
-            print(temp)
+            # Make the prediction
+            new_row = forecast(model, new_row.T, past_data)
+            append_data(new_row.T.flatten(), new_date)
             st.success("Data added successfully!")
 
 def add_metrics():
@@ -134,5 +138,4 @@ if __name__ == "__main__":
         add_figures()
 
         st.markdown("### Detailed Data View")
-        #st.session_state.data = st.session_state.data.astype(str) # TODO: Weird error about Date ?? Not sure how to resolve
         st.dataframe(st.session_state.data)
