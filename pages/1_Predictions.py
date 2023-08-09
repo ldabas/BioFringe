@@ -1,3 +1,4 @@
+
 import time
 import numpy as np
 import pandas as pd
@@ -6,9 +7,7 @@ import streamlit as st
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import load_model
 
-@st.cache_data
-def get_data() -> pd.DataFrame:
-    return pd.read_csv('./data/viable_dataset.csv', index_col='Date')
+import Home
 
 def append_data(new_data, new_date):
     st.session_state.data.loc[new_date] = new_data
@@ -53,6 +52,7 @@ def forecast(model, new_row, past_data):
     return forecast_next_day(model, past_data, new_row, scaler, look_back)
 
 def add_values():
+    st.markdown("<h1 style='text-align: center; color: black;'>Prediction of biogas production</h1>", unsafe_allow_html=True)
     with st.form("add_new_data"):
         st.markdown("## Add new values")
         col1, col2, col3 = st.columns(3)
@@ -76,69 +76,15 @@ def add_values():
             # Load the model
             model = load_model('./models/lstm_model_multi-io-tomorrow.h5')
             look_back = 30
-            past_data = df.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
+            past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
 
             # Make the prediction
             new_row = forecast(model, new_row.T, past_data)
             append_data(new_row.T.flatten(), new_date)
             st.success("Data added successfully!")
-
-def add_metrics():
-
-    kpi_metric = st.session_state.data[st.session_state.data.index.values == date_filter]
-    kpi1, kpi2 = st.columns(2)
-
-    kpi1.metric(
-        label="**BIOGAS_PRODUCTION_Q_DAY**",
-        value=kpi_metric["BIOGAS_PRODUCTION_Q_DAY"],
-    )
-
-    kpi2.metric(
-        label="**DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK**",
-        value=kpi_metric["DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"]
-    )
-
-def add_figures():
-    fig_col1, fig_col2 = st.columns(2)
-
-    with fig_col1:
-        st.markdown("## Biogas Production - PS_Q")
-        fig = px.density_heatmap(
-            data_frame=st.session_state.data, y="DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK", x="BIOGAS_PRODUCTION_Q_DAY"
-        )
-        st.write(fig)
-    
-    with fig_col2:
-        st.markdown("## Biogas Production - Date")
-        fig2 = px.line(data_frame=st.session_state.data, y="BIOGAS_PRODUCTION_Q_DAY", x=st.session_state.data.index.values)
-        st.write(fig2)
+            biogas = str(new_row.T[4]).replace('[', '')
+            biogas = biogas.replace(']','')
+            st.write("#### The predicted value of biogas production for " , new_date, " is ", biogas)
 
 if __name__ == "__main__":
-    st.set_page_config(
-        page_title="BioFringe",
-        # TODO page_icon: Maybe add BioFringe icon here??
-        layout="wide",
-    )
-    df = get_data()
-
-    # Title
-    st.markdown("<h1 style='text-align: center; color: black;'>Biogas production</h1>", unsafe_allow_html=True)
-
-    placeholder = st.empty()
-
-    with placeholder.container():
-
-        if 'data' not in st.session_state:
-            st.session_state.data = df
-
-        add_values()
-
-        # Top-level filter
-        date_filter = st.selectbox("**Select Date**", pd.unique(st.session_state.data.index.values))
-        
-        add_metrics()
-
-        add_figures()
-
-        st.markdown("### Detailed Data View")
-        st.dataframe(st.session_state.data)
+    add_values()
