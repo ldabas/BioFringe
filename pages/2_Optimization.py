@@ -73,7 +73,13 @@ class BiogasOptimizer:
                 min = dict(zip(self.X.columns, min))
                 max = dict(zip(self.X.columns, max))
                 result = self.optimize(min_values=min, max_values=max)
-                st.write("#### Your optimized values are", result)
+                st.write("#### Your optimized values are")
+                st.write("##### PS_Q_DAY: ", str(result[0]))
+                st.write("##### TPS_Q1_DAY: ", str(result[1]))
+                st.write("##### TWAS_DAF_QIN_DAY: ", str(result[2]))
+                st.write("##### DIGESTED_SLUDGE_QOUT_DAY: ", str(result[3]))
+                st.write("##### DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK: ", str(result[4]))
+
 
 if __name__ == "__main__":
     optimizer = BiogasOptimizer('./data/viable_dataset.csv')
