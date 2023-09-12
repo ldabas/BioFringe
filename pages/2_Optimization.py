@@ -7,6 +7,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from scipy.optimize import minimize
 
+st.set_page_config(layout="wide")
+
 class BiogasOptimizer:
     def __init__(self, data_path):
         # Load data
@@ -62,14 +64,31 @@ class BiogasOptimizer:
         st.markdown("<h1 style='text-align: center; color: black;'>Optimization of variables</h1>", unsafe_allow_html=True)
         with st.form('max_min_values'):
             st.markdown("## Add minimum and maximum values")
-            min = st.text_input("Enter minimum values separated by comma", help="i.e. 100,200,300,400,500")
-            max = st.text_input("Enter maximum values separated by comma", help="i.e. 100,200,300,400,500")
+            col_array = st.columns(5)
+            min = []
+            max = []
+            with col_array[0]:
+                min.append(st.number_input("Enter **PS_Q_DAY** minimum value", step=1e-4, format="%.4f"))
+                max.append(st.number_input("Enter **PS_Q_DAY** maximum value", step=1e-4, format="%.4f"))
+            
+            with col_array[1]:
+                min.append(st.number_input("Enter **TPS_Q1_DAY** minimum value", step=1e-4, format="%.4f"))
+                max.append(st.number_input("Enter **TPS_Q1_DAY** maximum value", step=1e-4, format="%.4f"))
+
+            with col_array[2]:
+                min.append(st.number_input("Enter **TWAS_DAF_QIN_DAY** minimum value", step=1e-4, format="%.4f"))
+                max.append(st.number_input("Enter **TWAS_DAF_QIN_DAY** maximum value", step=1e-4, format="%.4f"))
+
+            with col_array[3]:
+                min.append(st.number_input("Enter **DIGESTED_SLUDGE_QOUT_DAY** minimum value", step=1e-4, format="%.4f"))
+                max.append(st.number_input("Enter **DIGESTED_SLUDGE_QOUT_DAY** maximum value", step=1e-4, format="%.4f"))
+
+            with col_array[4]:
+                min.append(st.number_input("Enter **DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK** minimum value", step=1e-4, format="%.4f"))
+                max.append(st.number_input("Enter **DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK** maximum value", step=1e-4, format="%.4f"))
+
             submitted = st.form_submit_button()
             if submitted:
-                min = min.split(',')
-                max = max.split(',')
-                min = [int(input) for input in min]
-                max = [int(input) for input in max]
                 min = dict(zip(self.X.columns, min))
                 max = dict(zip(self.X.columns, max))
                 result = self.optimize(min_values=min, max_values=max)
