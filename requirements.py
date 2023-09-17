@@ -1,7 +1,8 @@
-tenserflow
+tensorflow
 pandas
-sklearn
+scikit-learn
 numpy
 matplotlib
 seaborn
-
+plotly
+streamlit
