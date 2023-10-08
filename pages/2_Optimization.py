@@ -63,42 +63,28 @@ class BiogasOptimizer:
     def get_optimized(self):
         st.markdown("<h1 style='text-align: center; color: black;'>Optimization of variables</h1>", unsafe_allow_html=True)
         with st.form('max_min_values'):
-            st.markdown("## Add minimum and maximum values")
-            col_array = st.columns(5)
+            st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'> Add minimum and maximum values</h1>", unsafe_allow_html=True)
+            col_array = st.columns(5, gap="small")
+            var_array = ["PS_Q_DAY", "TPS_Q1_DAY", "TWAS_DAF_QIN_DAY", "DIGESTED_SLUDGE_QOUT_DAY", "DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"]
             min = []
             max = []
-            with col_array[0]:
-                min.append(st.number_input("Enter **PS_Q_DAY** minimum value", step=1e-4, format="%.4f"))
-                max.append(st.number_input("Enter **PS_Q_DAY** maximum value", step=1e-4, format="%.4f"))
-            
-            with col_array[1]:
-                min.append(st.number_input("Enter **TPS_Q1_DAY** minimum value", step=1e-4, format="%.4f"))
-                max.append(st.number_input("Enter **TPS_Q1_DAY** maximum value", step=1e-4, format="%.4f"))
-
-            with col_array[2]:
-                min.append(st.number_input("Enter **TWAS_DAF_QIN_DAY** minimum value", step=1e-4, format="%.4f"))
-                max.append(st.number_input("Enter **TWAS_DAF_QIN_DAY** maximum value", step=1e-4, format="%.4f"))
-
-            with col_array[3]:
-                min.append(st.number_input("Enter **DIGESTED_SLUDGE_QOUT_DAY** minimum value", step=1e-4, format="%.4f"))
-                max.append(st.number_input("Enter **DIGESTED_SLUDGE_QOUT_DAY** maximum value", step=1e-4, format="%.4f"))
-
-            with col_array[4]:
-                min.append(st.number_input("Enter **DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK** minimum value", step=1e-4, format="%.4f"))
-                max.append(st.number_input("Enter **DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK** maximum value", step=1e-4, format="%.4f"))
+            for i in range(len(col_array)):
+                with col_array[i]:
+                    min.append(st.number_input("Enter **{}** minimum value".format(var_array[i]), step=1e-4, format="%.4f"))
+                    max.append(st.number_input("Enter **{}** maximum value".format(var_array[i]), step=1e-4, format="%.4f"))
 
             submitted = st.form_submit_button()
             if submitted:
                 min = dict(zip(self.X.columns, min))
                 max = dict(zip(self.X.columns, max))
                 result = self.optimize(min_values=min, max_values=max)
-                st.write("#### Your optimized values are")
-                st.write("##### PS_Q_DAY: ", str(result[0]))
-                st.write("##### TPS_Q1_DAY: ", str(result[1]))
-                st.write("##### TWAS_DAF_QIN_DAY: ", str(result[2]))
-                st.write("##### DIGESTED_SLUDGE_QOUT_DAY: ", str(result[3]))
-                st.write("##### DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK: ", str(result[4]))
-
+                pred = pd.DataFrame.from_dict({var_array[0]: [str(result[0])], \
+                        var_array[1]: [str(result[1])], \
+                        var_array[2]: [str(result[2])], \
+                        var_array[3]: [str(result[3])], \
+                        var_array[4]: [str(result[4])]})
+                st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Optimized Values</h1>", unsafe_allow_html=True)
+                st.table(pred)
 
 if __name__ == "__main__":
     optimizer = BiogasOptimizer('./data/viable_dataset.csv')

@@ -54,7 +54,7 @@ def forecast(model, new_row, past_data):
 def add_values():
     st.markdown("<h1 style='text-align: center; color: black;'>Prediction of biogas production</h1>", unsafe_allow_html=True)
     with st.form("add_new_data"):
-        st.markdown("## Add new values")
+        st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Add new values</h1>", unsafe_allow_html=True)
         col_array= st.columns(3)
         # TODO: Naming of vars is horrendous. We need to change that to something readable
         with col_array[0]:
