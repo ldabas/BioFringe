@@ -41,29 +41,32 @@ def add_figures():
         st.write(fig2)
 
 if __name__ == "__main__":
-    st.set_page_config(
-        page_title="BioFringe",
-        # TODO page_icon: Maybe add BioFringe icon here??
-        layout="wide",
-    )
-    df = get_data()
+    try:
+        st.set_page_config(
+            page_title="BioFringe",
+            # TODO page_icon: Maybe add BioFringe icon here??
+            layout="wide",
+        )
+        df = get_data()
 
-    # Title
-    st.markdown("<h1 style='text-align: center; color: black;'>BioFringe</h1>", unsafe_allow_html=True)
+        # Title
+        st.markdown("<h1 style='text-align: center; color: black;'>BioFringe</h1>", unsafe_allow_html=True)
 
-    placeholder = st.empty()
+        placeholder = st.empty()
 
-    with placeholder.container():
+        with placeholder.container():
 
-        if 'data' not in st.session_state:
-            st.session_state.data = df
+            if 'data' not in st.session_state:
+                st.session_state.data = df
 
-        # Top-level filter
-        date_filter = st.selectbox("**Select Date**", pd.unique(st.session_state.data.index.values))
-        
-        add_metrics()
+            # Top-level filter
+            date_filter = st.selectbox("**Select Date**", pd.unique(st.session_state.data.index.values))
+            
+            add_metrics()
 
-        add_figures()
+            add_figures()
 
-        st.markdown("### Detailed Data View")
-        st.dataframe(st.session_state.data)
+            st.markdown("### Detailed Data View")
+            st.dataframe(st.session_state.data)
+    except:
+        pass # This is here so errors are not propagated to the client

@@ -70,8 +70,8 @@ class BiogasOptimizer:
             max = []
             for i in range(len(col_array)):
                 with col_array[i]:
-                    min.append(st.number_input("Enter **{}** minimum value".format(var_array[i]), step=1e-4, format="%.4f"))
-                    max.append(st.number_input("Enter **{}** maximum value".format(var_array[i]), step=1e-4, format="%.4f"))
+                    min.append(st.number_input("Enter **{}** min".format(var_array[i]), step=1e-4, format="%.4f"))
+                    max.append(st.number_input("Enter **{}** max".format(var_array[i]), step=1e-4, format="%.4f"))
 
             submitted = st.form_submit_button()
             if submitted:
@@ -84,8 +84,11 @@ class BiogasOptimizer:
                         var_array[3]: [str(result[3])], \
                         var_array[4]: [str(result[4])]})
                 st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Optimized Values</h1>", unsafe_allow_html=True)
-                st.table(pred)
+                st.dataframe(pred, hide_index=True)
 
 if __name__ == "__main__":
-    optimizer = BiogasOptimizer('./data/viable_dataset.csv')
-    optimizer.get_optimized()
+    try:
+        optimizer = BiogasOptimizer('./data/viable_dataset.csv')
+        optimizer.get_optimized()
+    except:
+        pass # This is here so errors are not propagated to the client

@@ -58,7 +58,7 @@ def add_values():
         col_array= st.columns(3)
         # TODO: Naming of vars is horrendous. We need to change that to something readable
         with col_array[0]:
-            new_date = st.text_input("Enter **Date**")
+            new_date = st.date_input("Enter **Date**")
             new_ps_q_day = st.number_input("Enter **PS_Q_DAY**", step=1e-4, format="%.4f")
         
         with col_array[1]:
@@ -76,7 +76,10 @@ def add_values():
             # Load the model
             model = load_model('./models/lstm_model_multi-io-tomorrow.h5')
             look_back = 30
-            past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
+            if (hasattr(st.session_state, 'data')):
+                past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
+            else:
+                st.error("You should navigate to the Home Tab initially.")
 
             # Make the prediction
             new_row = forecast(model, new_row.T, past_data)
@@ -87,4 +90,7 @@ def add_values():
             st.write("#### The predicted value of biogas production for " , new_date, " is ", biogas)
 
 if __name__ == "__main__":
-    add_values()
+    try:
+        add_values()
+    except:
+        pass # This is here so errors are not propagated to the client
