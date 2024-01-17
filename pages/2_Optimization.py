@@ -65,7 +65,7 @@ class BiogasOptimizer:
         with st.form('max_min_values'):
             st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'> Add minimum and maximum values</h1>", unsafe_allow_html=True)
             col_array = st.columns(5, gap="small")
-            var_array = ["PS_Q_DAY", "TPS_Q1_DAY", "TWAS_DAF_QIN_DAY", "DIGESTED_SLUDGE_QOUT_DAY", "DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"]
+            var_array = ["Primary Sludge", "Thickened Primary Sludge", "Thickened Waste Activated Sludge", "Produced Digested Sludge", "Digested Dewater Sludge"]
             min = []
             max = []
             for i in range(len(col_array)):
@@ -84,7 +84,7 @@ class BiogasOptimizer:
                         var_array[3]: [str(result[3])], \
                         var_array[4]: [str(result[4])]})
                 st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Optimized Values</h1>", unsafe_allow_html=True)
-                st.dataframe(pred, hide_index=True)
+                st.dataframe(pred, hide_index=True, width=1600)
 
 if __name__ == "__main__":
     try:

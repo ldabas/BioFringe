@@ -16,12 +16,12 @@ def add_metrics():
     kpi1, kpi2 = st.columns(2)
 
     kpi1.metric(
-        label="**BIOGAS_PRODUCTION_Q_DAY**",
+        label="**Biogas Production(kJ/day)**",
         value=kpi_metric["BIOGAS_PRODUCTION_Q_DAY"],
     )
 
     kpi2.metric(
-        label="**DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK**",
+        label="**Digested Dewater Sludge (per week)**",
         value=kpi_metric["DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"]
     )
 
@@ -29,15 +29,18 @@ def add_figures():
     fig_col1, fig_col2 = st.columns(2)
 
     with fig_col1:
-        st.markdown("## Biogas Production - PS_Q")
+        st.markdown("<h1 style='text-align: center; color: black; font-size: 30px'>Biogas Production - Digested Dewater Sludge</h1>", unsafe_allow_html=True)
         fig = px.density_heatmap(
-            data_frame=st.session_state.data, y="DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK", x="BIOGAS_PRODUCTION_Q_DAY"
+            data_frame=st.session_state.data, y="DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK", x="BIOGAS_PRODUCTION_Q_DAY",
+            labels={"DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK":"Digested Dewater Sludge (per week)", "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production(kJ/day)"}
         )
         st.write(fig)
     
     with fig_col2:
-        st.markdown("## Biogas Production - Date")
-        fig2 = px.line(data_frame=st.session_state.data, y="BIOGAS_PRODUCTION_Q_DAY", x=st.session_state.data.index.values)
+        st.markdown("<h1 style='text-align: center; color: black; font-size: 30px'>Biogas Production - Date</h1>", unsafe_allow_html=True)
+        fig2 = px.line(data_frame=st.session_state.data, y="BIOGAS_PRODUCTION_Q_DAY", x=st.session_state.data.index.values,
+                       labels={"x":"Date", "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production(kJ/day)"}
+        )
         st.write(fig2)
 
 if __name__ == "__main__":
@@ -50,7 +53,7 @@ if __name__ == "__main__":
         df = get_data()
 
         # Title
-        st.markdown("<h1 style='text-align: center; color: black;'>BioFringe</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; color: black; font-size: 50px'>BioFringe</h1>", unsafe_allow_html=True)
 
         placeholder = st.empty()
 
@@ -66,7 +69,16 @@ if __name__ == "__main__":
 
             add_figures()
 
-            st.markdown("### Detailed Data View")
-            st.dataframe(st.session_state.data)
+            st.markdown("<h1 style='text-align: center; color: black; font-size: 40px;'>Detailed Data View</h1>", unsafe_allow_html=True)
+            st.dataframe(st.session_state.data, width=1600,
+                         column_config={
+                             "Date":"Date",
+                             "PS_Q_DAY":"Primary Sludge",
+                             "TPS_Q1_DAY":"Thickened Primary Sludge",
+                             "TWAS_DAF_QIN_DAY":"Thickened Waste Activated Sludge",
+                             "DIGESTED_SLUDGE_QOUT_DAY":"Produced Digested Sludge",
+                             "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production",
+                             "DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK":"Digested Dewater Sludge"
+                         })
     except:
         pass # This is here so errors are not propagated to the client
