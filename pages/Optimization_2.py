@@ -1,11 +1,15 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+from keras.models import load_model
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from scipy.optimize import minimize
+import statistics
+
+from pages.Predictions_1 import forecast
 
 st.set_page_config(layout="wide")
 
@@ -83,6 +87,7 @@ class BiogasOptimizer:
                         var_array[2]: [str(result[2])], \
                         var_array[3]: [str(result[3])], \
                         var_array[4]: [str(result[4])]})
+                
                 st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Optimized Values</h1>", unsafe_allow_html=True)
                 st.dataframe(pred, hide_index=True, width=1600)
 

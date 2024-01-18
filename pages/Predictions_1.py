@@ -46,7 +46,6 @@ def forecast(model, new_row, past_data):
     # For now, this will forecast for next day,
     # The functionality could be expanded to forecast for the
     # next 7 days once we add a new model in
-
     scaler = MinMaxScaler(feature_range=(0, 1))
     look_back = 30
     return forecast_next_day(model, past_data, new_row, scaler, look_back)
