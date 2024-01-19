@@ -64,6 +64,16 @@ class BiogasOptimizer:
 
         return optimal_input_features
     
+    def get_percent_incr(self, result):
+        result = np.insert(np.array(result), 4, 0.)
+        model = load_model('./models/lstm_model_multi-io-tomorrow.h5')
+        look_back = 30
+        if (hasattr(st.session_state, 'data')):
+            past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
+        else:
+            st.error("You should navigate to the Home Tab initially.")
+        new_row = forecast(model, result.T, past_data)
+    
     def get_optimized(self):
         st.markdown("<h1 style='text-align: center; color: black;'>Optimization of variables</h1>", unsafe_allow_html=True)
         with st.form('max_min_values'):
@@ -90,6 +100,8 @@ class BiogasOptimizer:
                 
                 st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Optimized Values</h1>", unsafe_allow_html=True)
                 st.dataframe(pred, hide_index=True, width=1600)
+
+                self.get_percent_incr(result)
 
 if __name__ == "__main__":
     try:
