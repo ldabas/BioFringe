@@ -64,15 +64,14 @@ class BiogasOptimizer:
 
         return optimal_input_features
     
-    def get_percent_incr(self, result):
+    def get_percent_incr(self, result, past_data):
         result = np.insert(np.array(result), 4, 0.)
         model = load_model('./models/lstm_model_multi-io-tomorrow.h5')
-        look_back = 30
-        if (hasattr(st.session_state, 'data')):
-            past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
-        else:
-            st.error("You should navigate to the Home Tab initially.")
-        new_row = forecast(model, result.T, past_data)
+        new_row = np.array(forecast(model, result.T, past_data))
+        new_biogas = new_row[0][4] # TODO (Byron): Why is this a matrix ?
+        old_biogas = st.session_state.data.loc[:, 'BIOGAS_PRODUCTION_Q_DAY'].mean()
+        perc_diff = ((new_biogas - old_biogas) / old_biogas) * 100
+        st.write("#### Percentage increase in biogas production estimation: " , perc_diff, "%")
     
     def get_optimized(self):
         st.markdown("<h1 style='text-align: center; color: black;'>Optimization of variables</h1>", unsafe_allow_html=True)
@@ -88,6 +87,12 @@ class BiogasOptimizer:
                     max.append(st.number_input("Enter **{}** max".format(var_array[i]), step=1e-4, format="%.4f"))
 
             submitted = st.form_submit_button()
+
+            look_back = 30
+            if (hasattr(st.session_state, 'data')):
+                past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
+            else:
+                st.error("You should navigate to the Home Tab initially.")
             if submitted:
                 min = dict(zip(self.X.columns, min))
                 max = dict(zip(self.X.columns, max))
@@ -101,7 +106,7 @@ class BiogasOptimizer:
                 st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'>Optimized Values</h1>", unsafe_allow_html=True)
                 st.dataframe(pred, hide_index=True, width=1600)
 
-                self.get_percent_incr(result)
+                self.get_percent_incr(result, past_data)
 
 if __name__ == "__main__":
     try:

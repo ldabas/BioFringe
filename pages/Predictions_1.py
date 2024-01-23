@@ -35,7 +35,7 @@ def forecast_next_day(model, past_data, new_row, scaler, look_back):
     data_reshaped = np.expand_dims(data_scaled, axis=0)
 
     # Perform the forecast
-    forecast = model.predict(data_reshaped)
+    forecast = model(data_reshaped)
 
     # Invert the scaling
     forecast_inverted = scaler.inverse_transform(forecast[0])
@@ -69,16 +69,17 @@ def add_values():
             new_dig_s_dwtr_ds_after_per_week = st.number_input("Enter **Digested Dewater Sludge**", step=1e-4, format="%.4f")
         submitted = st.form_submit_button()
 
+        if (hasattr(st.session_state, 'data')):
+            look_back = 30
+            past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
+        else:
+            st.error("You should navigate to the Home Tab initially.")
+
         if submitted:
             new_row = np.array([new_ps_q_day, new_tps_q1_day, new_twas_daf_qin_day, new_dig_s_qout_day, 0, new_dig_s_dwtr_ds_after_per_week])
 
             # Load the model
             model = load_model('./models/lstm_model_multi-io-tomorrow.h5')
-            look_back = 30
-            if (hasattr(st.session_state, 'data')):
-                past_data = st.session_state.data.iloc[-look_back + 1:].values  # Get the last look_back - 1 days of data
-            else:
-                st.error("You should navigate to the Home Tab initially.")
 
             # Make the prediction
             new_row = forecast(model, new_row.T, past_data)
