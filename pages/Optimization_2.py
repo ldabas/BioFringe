@@ -70,7 +70,7 @@ class BiogasOptimizer:
         new_row = np.array(forecast(model, result.T, past_data))
         new_biogas = new_row[0][4] # TODO (Byron): Why is this a matrix ?
         old_biogas = st.session_state.data.loc[:, 'BIOGAS_PRODUCTION_Q_DAY'].mean()
-        perc_diff = ((new_biogas - old_biogas) / old_biogas) * 100
+        perc_diff = np.abs(((new_biogas - old_biogas) / old_biogas) * 100)
         st.write("#### Percentage increase in biogas production estimation: " , perc_diff, "%")
     
     def get_optimized(self):
@@ -79,12 +79,13 @@ class BiogasOptimizer:
             st.markdown("<h1 style='text-align: center; color: black; font-size: 30px;'> Add minimum and maximum values</h1>", unsafe_allow_html=True)
             col_array = st.columns(5, gap="small")
             var_array = ["Primary Sludge", "Thickened Primary Sludge", "Thickened Waste Activated Sludge", "Produced Digested Sludge", "Digested Dewater Sludge"]
+            unit_array = ["(m3/d)", "(m3/d)", "(m3/d)", "(m3/d)", "(kg soln)"]
             min = []
             max = []
             for i in range(len(col_array)):
                 with col_array[i]:
-                    min.append(st.number_input("Enter **{}** min".format(var_array[i]), step=1e-4, format="%.4f"))
-                    max.append(st.number_input("Enter **{}** max".format(var_array[i]), step=1e-4, format="%.4f"))
+                    min.append(st.number_input("Enter **{} {}** min".format(var_array[i], unit_array[i]), step=1e-4, format="%.4f"))
+                    max.append(st.number_input("Enter **{} {}** max".format(var_array[i], unit_array[i]), step=1e-4, format="%.4f"))
 
             submitted = st.form_submit_button()
 

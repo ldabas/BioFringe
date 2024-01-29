@@ -16,12 +16,12 @@ def add_metrics():
     kpi1, kpi2 = st.columns(2)
 
     kpi1.metric(
-        label="**Biogas Production(kJ/day)**",
+        label="**Biogas Production (TCM/d)**",
         value=kpi_metric["BIOGAS_PRODUCTION_Q_DAY"],
     )
 
     kpi2.metric(
-        label="**Digested Dewater Sludge (per week)**",
+        label="**Digested Sludge Dewatering (%)**",
         value=kpi_metric["DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK"]
     )
 
@@ -29,17 +29,17 @@ def add_figures():
     fig_col1, fig_col2 = st.columns(2)
 
     with fig_col1:
-        st.markdown("<h1 style='text-align: center; color: black; font-size: 30px'>Biogas Production - Digested Dewater Sludge</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; color: black; font-size: 30px'>Biogas Production - Digested Dewater Sludge </h1>", unsafe_allow_html=True)
         fig = px.density_heatmap(
             data_frame=st.session_state.data, y="DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK", x="BIOGAS_PRODUCTION_Q_DAY",
-            labels={"DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK":"Digested Dewater Sludge (per week)", "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production(kJ/day)"}
+            labels={"DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK":"Digested Sludge Dewatering (%)", "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production (TCM/d)"}
         )
         st.write(fig)
     
     with fig_col2:
         st.markdown("<h1 style='text-align: center; color: black; font-size: 30px'>Biogas Production - Date</h1>", unsafe_allow_html=True)
         fig2 = px.line(data_frame=st.session_state.data, y="BIOGAS_PRODUCTION_Q_DAY", x=st.session_state.data.index.values,
-                       labels={"x":"Date", "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production(kJ/day)"}
+                       labels={"x":"Date", "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production (TCM/d)"}
         )
         st.write(fig2)
 
@@ -73,12 +73,12 @@ if __name__ == "__main__":
             st.dataframe(st.session_state.data, width=1600,
                          column_config={
                              "Date":"Date",
-                             "PS_Q_DAY":"Primary Sludge",
-                             "TPS_Q1_DAY":"Thickened Primary Sludge",
-                             "TWAS_DAF_QIN_DAY":"Thickened Waste Activated Sludge",
-                             "DIGESTED_SLUDGE_QOUT_DAY":"Produced Digested Sludge",
-                             "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production",
-                             "DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK":"Digested Dewater Sludge"
+                             "PS_Q_DAY":"Primary Sludge (m3/d)",
+                             "TPS_Q1_DAY":"Thickened Primary Sludge (m3/d)",
+                             "TWAS_DAF_QIN_DAY":"Thickened Waste Activated Sludge (m3/d)",
+                             "DIGESTED_SLUDGE_QOUT_DAY":"Produced Digested Sludge (m3/d)",
+                             "BIOGAS_PRODUCTION_Q_DAY":"Biogas Production (TCM/d)",
+                             "DIG_SLUDGE_DEWATER_DS_AFTER_DEWATER_3_PER_WEEK":"Digested Sludge Dewatering (kg soln)"
                          })
     except:
         pass # This is here so errors are not propagated to the client

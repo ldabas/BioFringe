@@ -58,15 +58,15 @@ def add_values():
         # TODO: Naming of vars is horrendous. We need to change that to something readable
         with col_array[0]:
             new_date = st.date_input("Enter **Date**")
-            new_ps_q_day = st.number_input("Enter **Primary Sludge**", step=1e-4, format="%.4f")
+            new_ps_q_day = st.number_input("Enter **Primary Sludge (m3/d)**", step=1e-4, format="%.4f")
         
         with col_array[1]:
-            new_tps_q1_day = st.number_input("Enter **Thickened Primary Sludge**", step=1e-4, format="%.4f")
-            new_twas_daf_qin_day = st.number_input("Enter **Thickened Waste Activated Sludge**", step=1e-4, format="%.4f")
+            new_tps_q1_day = st.number_input("Enter **Thickened Primary Sludge (m3/d)**", step=1e-4, format="%.4f")
+            new_twas_daf_qin_day = st.number_input("Enter **Thickened Waste Activated Sludge (m3/d)**", step=1e-4, format="%.4f")
         
         with col_array[2]:
-            new_dig_s_qout_day = st.number_input("Enter **Produced Digested Sludge**", step=1e-4, format="%.4f")
-            new_dig_s_dwtr_ds_after_per_week = st.number_input("Enter **Digested Dewater Sludge**", step=1e-4, format="%.4f")
+            new_dig_s_qout_day = st.number_input("Enter **Produced Digested Sludge (m3/d)**", step=1e-4, format="%.4f")
+            new_dig_s_dwtr_ds_after_per_week = st.number_input("Enter **Digested Dewater Sludge (kg soln)**", step=1e-4, format="%.4f")
         submitted = st.form_submit_button()
 
         if (hasattr(st.session_state, 'data')):
